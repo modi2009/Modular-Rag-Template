@@ -4,6 +4,12 @@ from ragas.llms import llm_factory
 from ragas.embeddings.base  import embedding_factory
 from ragas.metrics import faithfulness, context_precision
 from ragas.metrics.collections import AnswerRelevancy
+# providers/GeminiRagasProvider.py
+from ragas.metrics import (
+    Faithfulness,
+    ContextPrecision,
+    ResponseRelevancy  # Note: AnswerRelevancy is now ResponseRelevancy in latest versions
+)
 
 class GeminiRagasProvider(RAGASLLMInterface):
     def __init__(self, api_key: str):
@@ -27,18 +33,15 @@ class GeminiRagasProvider(RAGASLLMInterface):
         return self.embeddings
 
     def get_metrics(self):
-        # Attach the LLM/Embeddings to the metrics directly
-        # This prevents Ragas from trying to use OpenAI defaults
-        m1 = faithfulness
-        m1.llm = self.llm
+        # Instantiate the objects and link your Gemini provider
+        # This explicitly tells Ragas: "Use Gemini, NOT OpenAI defaults"
         
-        m2 = AnswerRelevancy
-        m2.llm = self.llm
-        m2.embeddings = self.embeddings
+        m1 = Faithfulness(llm=self.llm)
         
-        m3 = context_precision
-        m3.llm = self.llm
+        # Note: ResponseRelevancy requires both LLM and Embeddings
+        m2 = ResponseRelevancy(llm=self.llm, embeddings=self.embeddings)
         
+        m3 = ContextPrecision(llm=self.llm)
+        
+        # Return the list of INITIALIZED objects
         return [m1, m2, m3]
-
-

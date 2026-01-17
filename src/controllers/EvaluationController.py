@@ -3,6 +3,7 @@ from ragas import aevaluate
 from datasets import Dataset
 from .BaseController import BaseController
 from .NLPController import NLPController
+import numpy as np
 
 class EvaluationController(BaseController):
     def __init__(self, nlp_controller: NLPController, ragas_provider):
@@ -55,6 +56,10 @@ class EvaluationController(BaseController):
             llm=self.eval_llm,
             embeddings=self.eval_embeddings
         )
+        print(result)
         print("Evaluation completed.")
+        report_df = result.to_pandas()
+        print("Evaluation report generated.")
+        report_df = report_df.replace([np.inf, -np.inf], 0.0).fillna(0.0)
 
-        return result.to_pandas()
+        return report_df

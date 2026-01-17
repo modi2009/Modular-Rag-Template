@@ -1,4 +1,4 @@
-# 🚀 RAG Evaluation System with FastAPI 
+# 🚀 RAG Evaluation System with FastAPI
 
 A production-ready, modular RAG (Retrieval-Augmented Generation) pipeline built with FastAPI, featuring an automated evaluation suite powered by Ragas and Google Gemini. Designed with a **provider pattern architecture** for maximum flexibility—easily swap LLMs, vector databases, and evaluation frameworks without touching core logic.
 
@@ -87,6 +87,7 @@ This project implements a **provider pattern** to decouple core logic from speci
 - **Providers**: Concrete implementations (e.g., Gemini LLM, pgvector DB)
 
 **Benefits:**
+
 - Switch from Gemini to OpenAI by changing one environment variable
 - Swap pgvector for Pinecone without modifying application code
 - Test with different evaluation frameworks seamlessly
@@ -119,7 +120,7 @@ Before you begin, ensure you have the following installed:
 Open your WSL/Linux terminal:
 
 ```bash
-git clone 
+git clone
 cd rag-project
 ```
 
@@ -149,7 +150,7 @@ Create a `.env` file in the project root with the following structure:
 APP_NAME="Your App Name"
 APP_VERSION="Your App Version"
 FILE_ALLOWED_TYPES= ["text/plain","document/pdf", "document/txt", "document/docx","application/pdf"]
-FILE_MAX_SIZE=100 
+FILE_MAX_SIZE=100
 FILE_DEFAULT_CHUNK_SIZE=512 # 512KB
 
 
@@ -195,8 +196,6 @@ DEFAULT_LANG = "en"
 
 ### 5. Set Up PostgreSQL with pgvector inside docker
 
-
-
 ## 🚀 Running the Application
 
 ### Development Mode (with hot-reload)
@@ -208,6 +207,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 The API will be available at:
+
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 - **Base URL**: http://localhost:8000
@@ -246,19 +246,31 @@ docker-compose down
 
 - **POST** `/data/upload/{project_id}` - Upload documents (PDF, TXT, etc.)
 - **POST** `/data/upload/process/{project_id}` - process data and insert it into database
-
+  parameters:
+  file_id: str
+  chunk_size: Optional[int] = 100
+  overlap_size: Optional[int] = 20
+  do_reset: Optional[int] = 0
 
 ### RAG Queries (`/nlp`)
 
 - **POST** `/nlp/push/{project_id}` push vectorized data into vector db
+  parameters
+  do_reset: Optional[int] = 0
 - **GET** `/nlp/info/{project_id}` get info of vectorized data from db
 - **POST** `/nlp/search/{project_id}` search vector db using hybrid search and reranking
+  parameters:
+  text: str
+  top_k: Optional[int] = 5
 - **POST** `/nlp/answer/{project_id}` answer rag question
+  text: str
+  top_k: Optional[int] = 5
 
 ### Evaluation (`/evaluation`)
 
 - **POST** `/evaluation/{project_id}` - Run Ragas evaluation on query results
-
+  parameters:
+  test_queries: List[str]
 
 ---
 
@@ -302,18 +314,15 @@ Or extend `ChunkModel.py` to implement custom chunking logic.
 
 ## 🧪 Testing & Evaluation
 
-
-
 **Metrics Provided:**
+
 - **Answer Relevancy**: How relevant is the answer to the question?
 - **Faithfulness**: Is the answer grounded in retrieved context?
 - **Context Precision**: Quality of retrieved chunks
 - **Context Recall**: Coverage of relevant information
 
-
-
-
 For production, integrate with tools like:
+
 - **ELK Stack** (Elasticsearch, Logstash, Kibana)
 - **Prometheus** + **Grafana**
 - **DataDog** or **New Relic**
@@ -364,6 +373,7 @@ Contributions are welcome! Please follow these steps:
 
 **Issue**: `ModuleNotFoundError: No module named 'fastapi'`  
 **Solution**: Ensure virtual environment is activated and dependencies are installed:
+
 ```bash
 source venv/bin/activate
 pip install -r requirements.txt
@@ -371,6 +381,7 @@ pip install -r requirements.txt
 
 **Issue**: PostgreSQL connection refused  
 **Solution**: Check PostgreSQL is running:
+
 ```bash
 sudo service postgresql status
 sudo service postgresql start
@@ -378,12 +389,11 @@ sudo service postgresql start
 
 **Issue**: pgvector extension not found  
 **Solution**: Install pgvector for your PostgreSQL version:
+
 ```bash
 sudo apt install postgresql-14-pgvector
 ```
 
 ---
-
-
 
 **Built with ❤️ using FastAPI, Gemini, and Ragas**
